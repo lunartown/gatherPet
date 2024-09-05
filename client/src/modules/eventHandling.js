@@ -1,14 +1,8 @@
 export const EventHandlingMixin = {
   // 이벤트 리스너 설정
   setupEventListeners() {
-    game.subscribeToEvent(
-      "playerShootsConfetti",
-      this.onConfettiShot.bind(this)
-    );
-    game.subscribeToEvent(
-      "playerActivelySpeaking",
-      this.onPlayerSpeaking.bind(this)
-    );
+    game.subscribeToEvent("playerShootsConfetti", this.onConfettiShot.bind(this));
+    game.subscribeToEvent("playerActivelySpeaking", this.onPlayerSpeaking.bind(this));
   },
 
   // DOM 이벤트 리스너 설정
@@ -19,51 +13,53 @@ export const EventHandlingMixin = {
     while (true) {
       try {
         const bodyContainers = await this.navigateToBodyContainer();
-
+        // console.log(bodyContainers);
         if (!bodyContainers) {
           console.log("bodyContainer를 찾지 못함");
           await new Promise((resolve) => setTimeout(resolve, 2000)); // 5초 대기
           continue;
         }
-        const headContainer = bodyContainers[0];
-        const groupChatContainer = headContainer.querySelector(
-          ".css-6unyhe > :nth-child(2) > :nth-child(2) > :first-child :first-child"
-        );
+        if (bodyContainers.length > 1) {
+          const headContainer = bodyContainers[0];
+          const groupChatContainer = headContainer.querySelector(
+            ".css-6unyhe > :nth-child(2) > :nth-child(2) > :first-child :first-child",
+          );
 
-        if (groupChatContainer && groupChatContainer.textContent) {
-          const data = groupChatContainer.textContent;
-          const name = data.split(":")[0];
-          const message = data.split(":")[1].trim();
+          if (groupChatContainer && groupChatContainer.textContent) {
+            const data = groupChatContainer.textContent;
+            const name = data.split(":")[0];
+            if (data.split(":")[1] != undefined) {
+              const message = data.split(":")[1].trim();
 
-          if (
-            message !== this.lastProcessedGroupMessage ||
-            name !== this.lastProcessedGroupMessageFrom
-          ) {
-            console.log("새 메시지 발견:", message);
-            this.lastProcessedGroupMessageFrom = name;
-            this.lastProcessedGroupMessage = message;
-            this.onPlayerChat({ messageText: message });
+              if (
+                message !== this.lastProcessedGroupMessage ||
+                name !== this.lastProcessedGroupMessageFrom
+              ) {
+                console.log("새 메시지 발견:", message);
+                this.lastProcessedGroupMessageFrom = name;
+                this.lastProcessedGroupMessage = message;
+                this.onPlayerChat({ messageText: message });
+              }
+            }
+          } else {
+            // console.log("chatContainer를 찾지 못함");
           }
-        } else {
-          // console.log("chatContainer를 찾지 못함");
         }
 
-        const bodyContainer = bodyContainers[1];
+        const bodyContainer = bodyContainers[bodyContainers.length - 1];
         const nameContainer = bodyContainer.querySelector(
-          ".css-6unyhe > :nth-child(2) > :first-child > :first-child :first-child"
+          ".css-6unyhe > :nth-child(2) > :first-child > :first-child :first-child",
         );
         const chatContainer = bodyContainer.querySelector(
-          ".css-6unyhe > :nth-child(2) > :nth-child(2) > :first-child :first-child"
+          ".css-6unyhe > :nth-child(2) > :nth-child(2) > :first-child :first-child",
         );
 
         if (chatContainer && chatContainer.textContent) {
           const name = nameContainer.textContent;
           const message = chatContainer.textContent;
+          // console.log("메시지 읽는 중", message);
 
-          if (
-            message !== this.lastProcessedMessage ||
-            name !== this.lastProcessedMessageFrom
-          ) {
+          if (message !== this.lastProcessedMessage || name !== this.lastProcessedMessageFrom) {
             console.log("새 메시지 발견:", message);
             this.lastProcessedMessageFrom = name;
             this.lastProcessedMessage = message;
@@ -88,7 +84,7 @@ export const EventHandlingMixin = {
 
     function clickBackButton() {
       const backButton = document.querySelector(
-        'button[shape="icon"] svg path[d="M15 18l-6-6 6-6"]'
+        'button[shape="icon"] svg path[d="M15 18l-6-6 6-6"]',
       );
       if (backButton) {
         const buttonElement = backButton.closest("button");
@@ -121,21 +117,13 @@ export const EventHandlingMixin = {
         return bodyContainer;
       }
 
-      console.log(
-        `Attempt ${
-          attempt + 1
-        }: bodyContainer not found, attempting navigation...`
-      );
+      console.log(`Attempt ${attempt + 1}: bodyContainer not found, attempting navigation...`);
 
       if (clickBackButton()) {
         await new Promise((resolve) => setTimeout(resolve, waitTime));
         bodyContainer = findBodyContainer();
         if (bodyContainer && bodyContainer.length > 0) {
-          console.log(
-            `bodyContainer found after clicking back button on attempt ${
-              attempt + 1
-            }`
-          );
+          console.log(`bodyContainer found after clicking back button on attempt ${attempt + 1}`);
           return bodyContainer;
         }
       } else {
@@ -144,11 +132,7 @@ export const EventHandlingMixin = {
           await new Promise((resolve) => setTimeout(resolve, waitTime));
           bodyContainer = findBodyContainer();
           if (bodyContainer && bodyContainer.length > 0) {
-            console.log(
-              `bodyContainer found after clicking chat button on attempt ${
-                attempt + 1
-              }`
-            );
+            console.log(`bodyContainer found after clicking chat button on attempt ${attempt + 1}`);
             return bodyContainer;
           }
         } else {

@@ -40,19 +40,10 @@ export const MovementMixin = {
     if (!myPlayer) return;
 
     const maxDistance = 3;
-    const targetX =
-      myPlayer.x +
-      Math.floor(Math.random() * (maxDistance * 2 + 1)) -
-      maxDistance;
-    const targetY =
-      myPlayer.y +
-      Math.floor(Math.random() * (maxDistance * 2 + 1)) -
-      maxDistance;
+    const targetX = myPlayer.x + Math.floor(Math.random() * (maxDistance * 2 + 1)) - maxDistance;
+    const targetY = myPlayer.y + Math.floor(Math.random() * (maxDistance * 2 + 1)) - maxDistance;
 
-    const path = this.findPath(
-      { x: myPlayer.x, y: myPlayer.y },
-      { x: targetX, y: targetY }
-    );
+    const path = this.findPath({ x: myPlayer.x, y: myPlayer.y }, { x: targetX, y: targetY });
 
     if (path.length > 1) {
       const moveCount = Math.min(path.length - 1, maxDistance);
@@ -114,24 +105,22 @@ export const MovementMixin = {
       this.emojiQueue = [];
       this.showEmoji("💢");
       const mapId = gameSpace.mapId;
+      const x = myPlayer.x;
+      const y = myPlayer.y;
       await this.delay(300);
       await this.changeColor("yellow");
       await this.delay(300);
       game.teleport(mapId, 1, 57);
       await this.delay(300);
-      const direction = (target.direction - 1) % 2;
-      const dx = direction === 2 ? 1 : direction === 3 ? -1 : 0;
-      const dy = direction === 1 ? 1 : direction === 0 ? -1 : 0;
-      game.teleport(mapId, target.x + dx * 2, target.y + dy * 2);
+
+      game.teleport(mapId, target.x + (x - target.x) * 0.1, target.y + (y - target.y) * 0.1);
+      await this.changeColor("beige");
       await this.delay(300);
       return;
     }
 
     if (distance > this.idealDistance) {
-      const path = this.findPath(
-        { x: myPlayer.x, y: myPlayer.y },
-        { x: target.x, y: target.y }
-      );
+      const path = this.findPath({ x: myPlayer.x, y: myPlayer.y }, { x: target.x, y: target.y });
 
       if (path.length > 1) {
         const moveCount = Math.min(path.length - 1, this.maxMoveDistance);
