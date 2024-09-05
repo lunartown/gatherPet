@@ -75,13 +75,15 @@ export const MovementMixin = {
     // 방향 확인: 5(왼쪽), 7(오른쪽), 3(위), 1(아래)
     switch (player.direction) {
       case 5:
-        return dx === 1 && dy === 0;
+        return dx > 0;
       case 7:
-        return dx === -1 && dy === 0;
+        return dx < 0;
       case 3:
-        return dx === 0 && dy === 1;
+        return dy > 0;
       case 1:
-        return dx === 0 && dy === -1;
+        return dy < 0;
+      case 4:
+        return true;
       default:
         return false;
     }
@@ -108,6 +110,23 @@ export const MovementMixin = {
       return;
     }
 
+    if (distance > this.flashDistance) {
+      this.emojiQueue = [];
+      this.showEmoji("💢");
+      const mapId = gameSpace.mapId;
+      await this.delay(300);
+      await this.changeColor("yellow");
+      await this.delay(300);
+      game.teleport(mapId, 1, 57);
+      await this.delay(300);
+      const direction = (target.direction - 1) % 2;
+      const dx = direction === 2 ? 1 : direction === 3 ? -1 : 0;
+      const dy = direction === 1 ? 1 : direction === 0 ? -1 : 0;
+      game.teleport(mapId, target.x + dx * 2, target.y + dy * 2);
+      await this.delay(300);
+      return;
+    }
+
     if (distance > this.idealDistance) {
       const path = this.findPath(
         { x: myPlayer.x, y: myPlayer.y },
@@ -123,15 +142,15 @@ export const MovementMixin = {
       this.updateEmotion("excitement", 3);
       this.updateEmotion("tiredness", 2);
     } else {
-      if (!isFacing(myPlayer, target)) {
+      if (!this.isFacing(myPlayer, target)) {
         const dx = target.x - myPlayer.x;
         const dy = target.y - myPlayer.y;
         const direction = this.getDirection(dx, dy);
         game.move(direction, true);
       }
 
-      if (Math.random() < 0.02) {
-        this.performTrick();
+      if (Math.random() < 0.0006) {
+        await this.performTrick();
       }
     }
   },

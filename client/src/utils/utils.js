@@ -16,8 +16,7 @@ export const UtilsMixin = {
     return this.getDistance(player1, player2) <= range;
   },
 
-  // 트릭 수행
-  performTrick() {
-    // 트릭 수행 로직 (필요한 경우 구현)
+  async delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   },
 };

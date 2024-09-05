@@ -12,49 +12,158 @@ export const EventHandlingMixin = {
   },
 
   // DOM 이벤트 리스너 설정
-  startPeriodicCheck() {
+  async startPeriodicCheck() {
     console.log("startPeriodicCheck 메소드 시작");
     this.lastMessageCount = 0;
 
-    const checkInterval = setInterval(() => {
-      // console.log("주기적 체크 실행 중...");
+    while (true) {
       try {
-        const bodyContainers = document.getElementsByClassName(
-          "sendbird-channel-list__body"
-        );
-        // console.log("bodyContainers 찾음:", bodyContainers.length);
+        const bodyContainers = await this.navigateToBodyContainer();
 
-        if (bodyContainers.length === 0) {
-          console.log("bodyContainers를 찾지 못함");
-          return;
+        if (!bodyContainers) {
+          console.log("bodyContainer를 찾지 못함");
+          await new Promise((resolve) => setTimeout(resolve, 2000)); // 5초 대기
+          continue;
         }
-
-        const chatContainer = bodyContainers[
-          bodyContainers.length - 1
-        ]?.querySelector(
+        const headContainer = bodyContainers[0];
+        const groupChatContainer = headContainer.querySelector(
           ".css-6unyhe > :nth-child(2) > :nth-child(2) > :first-child :first-child"
         );
-        // console.log("chatContainer 찾음:", chatContainer ? "성공" : "실패");
 
-        if (chatContainer) {
-          const message = chatContainer.textContent;
-          // console.log("현재 메시지:", message);
-          // console.log("마지막 처리된 메시지:", this.lastProcessedMessage);
+        if (groupChatContainer && groupChatContainer.textContent) {
+          const data = groupChatContainer.textContent;
+          const name = data.split(":")[0];
+          const message = data.split(":")[1].trim();
 
-          if (message !== this.lastProcessedMessage) {
+          if (
+            message !== this.lastProcessedGroupMessage ||
+            name !== this.lastProcessedGroupMessageFrom
+          ) {
             console.log("새 메시지 발견:", message);
-            this.lastProcessedMessage = message;
+            this.lastProcessedGroupMessageFrom = name;
+            this.lastProcessedGroupMessage = message;
             this.onPlayerChat({ messageText: message });
-          } else {
-            // console.log("새 메시지 없음");
           }
         } else {
           // console.log("chatContainer를 찾지 못함");
         }
+
+        const bodyContainer = bodyContainers[1];
+        const nameContainer = bodyContainer.querySelector(
+          ".css-6unyhe > :nth-child(2) > :first-child > :first-child :first-child"
+        );
+        const chatContainer = bodyContainer.querySelector(
+          ".css-6unyhe > :nth-child(2) > :nth-child(2) > :first-child :first-child"
+        );
+
+        if (chatContainer && chatContainer.textContent) {
+          const name = nameContainer.textContent;
+          const message = chatContainer.textContent;
+
+          if (
+            message !== this.lastProcessedMessage ||
+            name !== this.lastProcessedMessageFrom
+          ) {
+            console.log("새 메시지 발견:", message);
+            this.lastProcessedMessageFrom = name;
+            this.lastProcessedMessage = message;
+            this.onPlayerChat({ messageText: message });
+          }
+        } else {
+          console.log("chatContainer를 찾지 못함");
+        }
       } catch (error) {
         console.error("주기적 체크 중 오류 발생:", error);
       }
-    }, 1000);
+
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // 1초 대기
+    }
+  },
+
+  // 바디 컨테이너 탐색
+  async navigateToBodyContainer() {
+    function findBodyContainer() {
+      return document.getElementsByClassName("sendbird-channel-list__body");
+    }
+
+    function clickBackButton() {
+      const backButton = document.querySelector(
+        'button[shape="icon"] svg path[d="M15 18l-6-6 6-6"]'
+      );
+      if (backButton) {
+        const buttonElement = backButton.closest("button");
+        if (buttonElement) {
+          buttonElement.click();
+          console.log("Back button clicked");
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function clickChatButton() {
+      const chatButton = document.querySelector('button[aria-label="Chat"]');
+      if (chatButton) {
+        chatButton.click();
+        console.log("Chat button clicked");
+        return true;
+      }
+      return false;
+    }
+
+    const maxAttempts = 5;
+    const waitTime = 2000; // 2초
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      let bodyContainer = findBodyContainer();
+      if (bodyContainer && bodyContainer.length > 0) {
+        // console.log(`bodyContainer found on attempt ${attempt + 1}`);
+        return bodyContainer;
+      }
+
+      console.log(
+        `Attempt ${
+          attempt + 1
+        }: bodyContainer not found, attempting navigation...`
+      );
+
+      if (clickBackButton()) {
+        await new Promise((resolve) => setTimeout(resolve, waitTime));
+        bodyContainer = findBodyContainer();
+        if (bodyContainer && bodyContainer.length > 0) {
+          console.log(
+            `bodyContainer found after clicking back button on attempt ${
+              attempt + 1
+            }`
+          );
+          return bodyContainer;
+        }
+      } else {
+        console.log("Back button not found, trying chat button");
+        if (clickChatButton()) {
+          await new Promise((resolve) => setTimeout(resolve, waitTime));
+          bodyContainer = findBodyContainer();
+          if (bodyContainer && bodyContainer.length > 0) {
+            console.log(
+              `bodyContainer found after clicking chat button on attempt ${
+                attempt + 1
+              }`
+            );
+            return bodyContainer;
+          }
+        } else {
+          console.log("Neither back button nor chat button found");
+        }
+      }
+
+      if (attempt < maxAttempts - 1) {
+        console.log(`Waiting before next attempt...`);
+        await new Promise((resolve) => setTimeout(resolve, waitTime));
+      }
+    }
+
+    // console.log(`bodyContainer not found after ${maxAttempts} attempts`);
+    return null;
   },
 
   // AI 응답 생성 (큐 사용)
@@ -104,14 +213,14 @@ export const EventHandlingMixin = {
   // 채팅에 응답
   respondToChat(response) {
     console.log("respondToChat 호출됨, 응답:", response);
-    const currentName = game.getMyPlayer().name;
-    console.log("현재 이름:", currentName);
+    // const currentName = game.getMyPlayer().name;
+    // console.log("현재 이름:", currentName);
     game.setName(response);
     console.log("이름을 응답으로 변경함");
 
     setTimeout(() => {
-      game.setName(currentName);
-      console.log("5초 후 원래 이름으로 복구");
+      game.setName(this.name);
+      console.log("8초 후 원래 이름으로 복구");
     }, 8000);
   },
 };

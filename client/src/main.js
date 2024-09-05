@@ -6,6 +6,7 @@ import { EventHandlingMixin } from "./modules/eventHandling.js";
 import { MovementMixin } from "./modules/movement.js";
 import { PathfindingMixin } from "./modules/pathfinding.js";
 import { PlayerInteractionMixin } from "./modules/playerInteraction.js";
+import { TricksMixin } from "./modules/tricks.js";
 import { UtilsMixin } from "./utils/utils.js";
 
 Object.assign(
@@ -17,7 +18,8 @@ Object.assign(
   EmotionsMixin,
   EmojiMixin,
   ApiMixin,
-  UtilsMixin
+  UtilsMixin,
+  TricksMixin
 );
 
 function runCustomPet() {

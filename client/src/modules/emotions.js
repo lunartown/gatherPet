@@ -35,47 +35,60 @@ export const EmotionsMixin = {
 
   // 감정 상태에 따른 반응
   reactToEmotionalState() {
-    // console.log(
-    //   "emotions : happiness : ",
-    //   this.emotion.happiness + " excitement : ",
-    //   this.emotion.excitement + " tiredness : ",
-    //   this.emotion.tiredness
-    // );
+    console.log(
+      "emotions : happiness : ",
+      this.emotion.happiness + " excitement : ",
+      this.emotion.excitement + " tiredness : ",
+      this.emotion.tiredness
+    );
     const state = this.getEmotionalState();
+    const emojiLists = {
+      "very happy": ["😄", "🎉", "🎈", "🎊", "💖"],
+      happy: ["🙂", "☀️", "🌻", "🌈", "✨"],
+      sad: ["😢", "☁️", "🌧️", "🍂", "🕯️"],
+      "very excited": ["🤩", "🎆", "🚀", "⚡", "🔥"],
+      excited: ["😃", "🌟", "🎵", "🏃‍♂️", "💫"],
+      bored: ["😴", "🕰️", "📚", "🧩", "🎭"],
+      exhausted: ["😫", "🏳️", "🛌", "☕", "🧘‍♂️"],
+      tired: ["😩", "🌙", "🛋️", "🧸", "🍵"],
+      energetic: ["💪", "🏋️‍♂️", "🚴‍♀️", "🏆", "🥇"],
+      default: ["😐", "❓", "🤔", "🧐", "📊"],
+    };
+
+    const chooseRandomEmoji = (list) =>
+      list[Math.floor(Math.random() * list.length)];
+
     switch (state) {
       case "very happy":
-        this.showEmoji("😄");
-        this.performTrick();
+        this.showEmoji(chooseRandomEmoji(emojiLists["very happy"]));
         break;
       case "happy":
-        this.showEmoji("🙂");
+        this.showEmoji(chooseRandomEmoji(emojiLists["happy"]));
         break;
       case "sad":
-        this.showEmoji("😢");
+        this.showEmoji(chooseRandomEmoji(emojiLists["sad"]));
         break;
       case "very excited":
-        this.showEmoji("🤩");
-        this.performTrick();
+        this.showEmoji(chooseRandomEmoji(emojiLists["very excited"]));
         break;
       case "excited":
-        this.showEmoji("😃");
+        this.showEmoji(chooseRandomEmoji(emojiLists["excited"]));
         break;
       case "bored":
-        this.showEmoji("😴");
+        this.showEmoji(chooseRandomEmoji(emojiLists["bored"]));
         break;
       case "exhausted":
-        this.showEmoji("😫");
-        this.safeMove(Math.floor(Math.random() * 4)); // 랜덤한 방향으로 느리게 이동
+        this.showEmoji(chooseRandomEmoji(emojiLists["exhausted"]));
+        this.safeMove(Math.floor(Math.random() * 4));
         break;
       case "tired":
-        this.showEmoji("😩");
+        this.showEmoji(chooseRandomEmoji(emojiLists["tired"]));
         break;
       case "energetic":
-        this.showEmoji("💪");
-        this.performTrick();
+        this.showEmoji(chooseRandomEmoji(emojiLists["energetic"]));
         break;
       default:
-        this.showEmoji("😐");
+        this.showEmoji(chooseRandomEmoji(emojiLists["default"]));
     }
   },
 

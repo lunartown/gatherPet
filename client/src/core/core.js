@@ -4,16 +4,17 @@ export class MyCustomPet {
     this.isActive = false;
     this.ownerId = null;
     this.grid = null;
-    this.lastProcessedMessage = "";
+    this.name = "Lily the Ghost";
 
     // 동작 관련 설정
     this.movementInterval = null;
     this.followRange = 8;
-    this.loseInterestRange = 12;
+    this.loseInterestRange = 10;
     this.normalInterval = 3000;
     this.followingInterval = 1;
     this.maxMoveDistance = 3;
     this.maxFollowDistance = 3;
+    this.flashDistance = 5;
     this.idealDistance = 2;
     this.moveDelay = 170;
 
@@ -38,12 +39,105 @@ export class MyCustomPet {
     };
     this.MAX_EMOTION = 100;
     this.MIN_EMOTION = 0;
-    this.emotionDecayInterval = setInterval(() => this.decayEmotions(), 60000); // 1분마다 감정 감소
+    this.emotionDecayInterval = setInterval(() => this.decayEmotions(), 1000); // 1분마다 감정 감소
 
     // 이모지 큐 설정
     this.emojiQueue = [];
     this.isShowingEmoji = false;
     this.emojiDuration = 3000;
+
+    // 메시지 관련 설정
+    this.lastProcessedMessage = "";
+    this.lastProcessedMessageFrom = "";
+    this.lastProcessedGroupMessage = "";
+    this.lastProcessedGroupMessageFrom = "";
+
+    this.costume = {
+      white: {
+        skin: "gV7nljNpXAGHgAEnbBWv",
+        hair: "3ZnyOry7q9szgHCU1URo",
+        facial_hair: "",
+        top: "GOIono5TlL1mMHqoryfb",
+        bottom: "R-mO0WjmRySf-DdFAMmb",
+        shoes: "qXZsUMXd6wr2ICupUTcz",
+        hat: "",
+        glasses: "",
+        other: "",
+        costume: "Mva4mNGosmKAroMHPP5j",
+        mobility: "",
+        jacket: "",
+      },
+      orange: {
+        skin: "gV7nljNpXAGHgAEnbBWv",
+        hair: "3ZnyOry7q9szgHCU1URo",
+        facial_hair: "",
+        top: "GOIono5TlL1mMHqoryfb",
+        bottom: "R-mO0WjmRySf-DdFAMmb",
+        shoes: "qXZsUMXd6wr2ICupUTcz",
+        hat: "",
+        glasses: "",
+        other: "",
+        costume: "RwIQhCJaKItQY2O5nQgD",
+        mobility: "",
+        jacket: "",
+      },
+      yellow: {
+        skin: "gV7nljNpXAGHgAEnbBWv",
+        hair: "3ZnyOry7q9szgHCU1URo",
+        facial_hair: "",
+        top: "GOIono5TlL1mMHqoryfb",
+        bottom: "R-mO0WjmRySf-DdFAMmb",
+        shoes: "qXZsUMXd6wr2ICupUTcz",
+        hat: "",
+        glasses: "",
+        other: "",
+        costume: "fQKQ0hT47tEiGOK8LH9D",
+        mobility: "",
+        jacket: "",
+      },
+      beige: {
+        skin: "gV7nljNpXAGHgAEnbBWv",
+        hair: "3ZnyOry7q9szgHCU1URo",
+        facial_hair: "",
+        top: "GOIono5TlL1mMHqoryfb",
+        bottom: "R-mO0WjmRySf-DdFAMmb",
+        shoes: "qXZsUMXd6wr2ICupUTcz",
+        hat: "",
+        glasses: "",
+        other: "",
+        costume: "arv3Gj35Qeu5vrpg-lTm",
+        mobility: "",
+        jacket: "",
+      },
+      gray: {
+        skin: "gV7nljNpXAGHgAEnbBWv",
+        hair: "3ZnyOry7q9szgHCU1URo",
+        facial_hair: "",
+        top: "GOIono5TlL1mMHqoryfb",
+        bottom: "R-mO0WjmRySf-DdFAMmb",
+        shoes: "qXZsUMXd6wr2ICupUTcz",
+        hat: "",
+        glasses: "",
+        other: "",
+        costume: "cKgv0pjT9PWQ5q5Xf4ib",
+        mobility: "",
+        jacket: "",
+      },
+      skyblue: {
+        skin: "gV7nljNpXAGHgAEnbBWv",
+        facial_hair: "",
+        hair: "3ZnyOry7q9szgHCU1URo",
+        top: "GOIono5TlL1mMHqoryfb",
+        bottom: "R-mO0WjmRySf-DdFAMmb",
+        shoes: "qXZsUMXd6wr2ICupUTcz",
+        hat: "",
+        glasses: "",
+        other: "",
+        costume: "arv3Gj35Qeu5vrpg-lTm",
+        mobility: "",
+        jacket: "",
+      },
+    };
   }
 
   // 행동 시작
@@ -99,7 +193,7 @@ export class MyCustomPet {
     const myPlayer = game.getMyPlayer();
     if (!myPlayer) return;
 
-    if (Math.random() < 0.0005) {
+    if (Math.random() < (this.ownerId ? 0.00015 : 0.015)) {
       this.reactToEmotionalState();
     }
 
