@@ -1,0 +1,115 @@
+{
+    "$case": "playerSetsEmoteV2",
+    "playerSetsEmoteV2": {
+        "encId": 18,
+        "emote": "🌟"
+    }
+}
+
+{
+    "spaceId": "3jZeEYm19QeGI04E\\hh99_carrer_reboot_4",
+    "player": {
+        "affiliation": "",
+        "allowScreenPointer": false,
+        "connected": true,
+        "currentlyEquippedWearables": {
+            "skin": "gV7nljNpXAGHgAEnbBWv",
+            "hair": "3ZnyOry7q9szgHCU1URo",
+            "facial_hair": "",
+            "top": "GOIono5TlL1mMHqoryfb",
+            "bottom": "R-mO0WjmRySf-DdFAMmb",
+            "shoes": "qXZsUMXd6wr2ICupUTcz",
+            "hat": "",
+            "glasses": "",
+            "other": "",
+            "costume": "arv3Gj35Qeu5vrpg-lTm",
+            "mobility": "",
+            "jacket": ""
+        },
+        "description": "",
+        "deskInfo": {
+            "deskId": "",
+            "locked": false,
+            "mapId": ""
+        },
+        "displayEmail": "",
+        "emojiStatus": "",
+        "focusModeEndTime": "",
+        "ambientPlayersMuted": {},
+        "inventory": {
+            "items": {},
+            "order": {}
+        },
+        "isNpc": false,
+        "itemString": "",
+        "map": "p9DKcA_m8Gb7WJ-dDTvwz",
+        "name": "Lily the Ghost",
+        "personalImageId": "",
+        "personalImageUrl": "",
+        "phone": "",
+        "profileImageId": "",
+        "profileImageUrl": "",
+        "pronouns": "",
+        "textStatus": "",
+        "timezone": "",
+        "title": "",
+        "city": "",
+        "country": "",
+        "status": "Available",
+        "statusUpdatedAt": "",
+        "statusEndOption": "NONE_SELECTED",
+        "statusChangeSource": "Manual",
+        "statusExpiresAt": "",
+        "statusExpiresToStatus": "DoNotDisturb",
+        "statusExpiresToChangeSource": "SleepManager",
+        "statusExpiresToExpireTime": "",
+        "lastRaisedHand": "",
+        "handRaisedAt": "",
+        "startDate": "",
+        "x": 77,
+        "y": 43,
+        "direction": 5,
+        "spaceUserUuid": "4c32e664-57f8-4adc-bf47-f24df294e8a5",
+        "role": "Guest",
+        "id": "aQ3LKGPABsfHptF4eX1VRSho80r2",
+        "userUuid": "b48a3198-6951-41de-8d98-c99d334b2bfc",
+        "ghost": 0,
+        "shimmy": false,
+        "spotlighted": 0,
+        "emote": "",
+        "away": false,
+        "activelySpeaking": 0,
+        "lastActive": "2024-09-05T10:05:45.930Z",
+        "lastInputId": 8481,
+        "whisperId": "",
+        "isSignedIn": true,
+        "eventStatus": "",
+        "inConversation": false,
+        "vehicleId": "",
+        "speedModifier": 1,
+        "isAlone": false,
+        "isMobile": false,
+        "followTarget": "",
+        "manualVideoSrc": "",
+        "subtitle": "",
+        "activityStatus": {},
+        "isInFocusMode": false,
+        "spotlightedBy": 18,
+        "action": "dismount",
+        "previousVehicleId": ""
+    },
+    "playerId": "aQ3LKGPABsfHptF4eX1VRSho80r2"
+}
+
+모든 이벤트 로깅
+(function() {
+    const originalSubscribe = game.subscribeToEvent;
+    game.subscribeToEvent = function(eventName, callback) {
+        console.log(`Subscribed to event: ${eventName}`);
+        return originalSubscribe.call(this, eventName, (...args) => {
+            console.log(`Event triggered: ${eventName}`, ...args);
+            return callback.apply(this, args);
+        });
+    };
+    console.log("Event logging activated. Perform actions in the game to see logged events.");
+})();

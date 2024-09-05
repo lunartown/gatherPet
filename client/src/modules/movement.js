@@ -40,10 +40,19 @@ export const MovementMixin = {
     if (!myPlayer) return;
 
     const maxDistance = 3;
-    const targetX = myPlayer.x + Math.floor(Math.random() * (maxDistance * 2 + 1)) - maxDistance;
-    const targetY = myPlayer.y + Math.floor(Math.random() * (maxDistance * 2 + 1)) - maxDistance;
+    const targetX =
+      myPlayer.x +
+      Math.floor(Math.random() * (maxDistance * 2 + 1)) -
+      maxDistance;
+    const targetY =
+      myPlayer.y +
+      Math.floor(Math.random() * (maxDistance * 2 + 1)) -
+      maxDistance;
 
-    const path = this.findPath({ x: myPlayer.x, y: myPlayer.y }, { x: targetX, y: targetY });
+    const path = this.findPath(
+      { x: myPlayer.x, y: myPlayer.y },
+      { x: targetX, y: targetY }
+    );
 
     if (path.length > 1) {
       const moveCount = Math.min(path.length - 1, maxDistance);
@@ -66,17 +75,19 @@ export const MovementMixin = {
     // 방향 확인: 5(왼쪽), 7(오른쪽), 3(위), 1(아래)
     switch (player.direction) {
       case 5:
+      case 6:
         return dx > 0;
       case 7:
+      case 8:
         return dx < 0;
       case 3:
+      case 4:
         return dy > 0;
       case 1:
+      case 2:
         return dy < 0;
-      case 4:
-        return true;
       default:
-        return false;
+        return true;
     }
   },
 
@@ -111,13 +122,20 @@ export const MovementMixin = {
       // game.teleport(mapId, 1, 57);
       // await this.delay(300);
 
-      game.teleport(mapId, target.x + (x - target.x) * 0.1, target.y + (y - target.y) * 0.1);
+      game.teleport(
+        mapId,
+        target.x + (x - target.x) * 0.1,
+        target.y + (y - target.y) * 0.1
+      );
       // await this.changeColor("beige");
       return;
     }
 
     if (distance > this.idealDistance) {
-      const path = this.findPath({ x: myPlayer.x, y: myPlayer.y }, { x: target.x, y: target.y });
+      const path = this.findPath(
+        { x: myPlayer.x, y: myPlayer.y },
+        { x: target.x, y: target.y }
+      );
 
       if (path.length > 1) {
         const moveCount = Math.min(path.length - 1, this.maxMoveDistance);

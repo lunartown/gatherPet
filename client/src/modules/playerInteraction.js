@@ -54,18 +54,23 @@ export const PlayerInteractionMixin = {
     const dy = player.y - target.y;
     const distance = Math.abs(dx) + Math.abs(dy);
     console.log("Distance:", distance, dx, dy);
+    console.log("Player direction:", player.direction);
 
     if (distance !== 1) return false;
 
     // 방향 확인: 5(왼쪽), 7(오른쪽), 3(위), 1(아래)
     switch (player.direction) {
       case 5:
+      case 6:
         return dx === 1 && dy === 0;
       case 7:
+      case 8:
         return dx === -1 && dy === 0;
       case 3:
+      case 4:
         return dx === 0 && dy === 1;
       case 1:
+      case 2:
         return dx === 0 && dy === -1;
       default:
         return false;

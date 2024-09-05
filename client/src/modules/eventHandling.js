@@ -1,8 +1,18 @@
 export const EventHandlingMixin = {
   // 이벤트 리스너 설정
   setupEventListeners() {
-    game.subscribeToEvent("playerShootsConfetti", this.onConfettiShot.bind(this));
-    game.subscribeToEvent("playerActivelySpeaking", this.onPlayerSpeaking.bind(this));
+    game.subscribeToEvent(
+      "playerShootsConfetti",
+      this.onConfettiShot.bind(this)
+    );
+    game.subscribeToEvent(
+      "playerActivelySpeaking",
+      this.onPlayerSpeaking.bind(this)
+    );
+    game.subscribeToEvent(
+      "playerSetsEmoteV2",
+      this.onPlayerSetsEmote.bind(this)
+    );
   },
 
   // DOM 이벤트 리스너 설정
@@ -22,7 +32,7 @@ export const EventHandlingMixin = {
         if (bodyContainers.length > 1) {
           const headContainer = bodyContainers[0];
           const groupChatContainer = headContainer.querySelector(
-            ".css-6unyhe > :nth-child(2) > :nth-child(2) > :first-child :first-child",
+            ".css-6unyhe > :nth-child(2) > :nth-child(2) > :first-child :first-child"
           );
 
           if (groupChatContainer && groupChatContainer.textContent) {
@@ -48,10 +58,10 @@ export const EventHandlingMixin = {
 
         const bodyContainer = bodyContainers[bodyContainers.length - 1];
         const nameContainer = bodyContainer.querySelector(
-          ".css-6unyhe > :nth-child(2) > :first-child > :first-child :first-child",
+          ".css-6unyhe > :nth-child(2) > :first-child > :first-child :first-child"
         );
         const chatContainer = bodyContainer.querySelector(
-          ".css-6unyhe > :nth-child(2) > :nth-child(2) > :first-child :first-child",
+          ".css-6unyhe > :nth-child(2) > :nth-child(2) > :first-child :first-child"
         );
 
         if (chatContainer && chatContainer.textContent) {
@@ -59,7 +69,10 @@ export const EventHandlingMixin = {
           const message = chatContainer.textContent;
           // console.log("메시지 읽는 중", message);
 
-          if (message !== this.lastProcessedMessage || name !== this.lastProcessedMessageFrom) {
+          if (
+            message !== this.lastProcessedMessage ||
+            name !== this.lastProcessedMessageFrom
+          ) {
             console.log("새 메시지 발견:", message);
             this.lastProcessedMessageFrom = name;
             this.lastProcessedMessage = message;
@@ -84,7 +97,7 @@ export const EventHandlingMixin = {
 
     function clickBackButton() {
       const backButton = document.querySelector(
-        'button[shape="icon"] svg path[d="M15 18l-6-6 6-6"]',
+        'button[shape="icon"] svg path[d="M15 18l-6-6 6-6"]'
       );
       if (backButton) {
         const buttonElement = backButton.closest("button");
@@ -117,13 +130,21 @@ export const EventHandlingMixin = {
         return bodyContainer;
       }
 
-      console.log(`Attempt ${attempt + 1}: bodyContainer not found, attempting navigation...`);
+      console.log(
+        `Attempt ${
+          attempt + 1
+        }: bodyContainer not found, attempting navigation...`
+      );
 
       if (clickBackButton()) {
         await new Promise((resolve) => setTimeout(resolve, waitTime));
         bodyContainer = findBodyContainer();
         if (bodyContainer && bodyContainer.length > 0) {
-          console.log(`bodyContainer found after clicking back button on attempt ${attempt + 1}`);
+          console.log(
+            `bodyContainer found after clicking back button on attempt ${
+              attempt + 1
+            }`
+          );
           return bodyContainer;
         }
       } else {
@@ -132,7 +153,11 @@ export const EventHandlingMixin = {
           await new Promise((resolve) => setTimeout(resolve, waitTime));
           bodyContainer = findBodyContainer();
           if (bodyContainer && bodyContainer.length > 0) {
-            console.log(`bodyContainer found after clicking chat button on attempt ${attempt + 1}`);
+            console.log(
+              `bodyContainer found after clicking chat button on attempt ${
+                attempt + 1
+              }`
+            );
             return bodyContainer;
           }
         } else {
@@ -163,29 +188,6 @@ export const EventHandlingMixin = {
     }
   },
 
-  // 컨페티 이벤트 처리
-  onConfettiShot(data, context) {
-    console.log("Confetti shot event received:", context);
-    const shooterId = context.playerId;
-    const shooter = game.players[shooterId];
-    const myPlayer = game.getMyPlayer();
-
-    if (this.isAdjacentAndFacing(shooter, myPlayer)) {
-      this.changeOwner(shooterId);
-    }
-  },
-
-  // 플레이어 말하기 이벤트 처리
-  onPlayerSpeaking(data, context) {
-    const speakerId = context.playerId;
-    const speaker = game.players[speakerId];
-    const myPlayer = game.getMyPlayer();
-
-    if (this.isNearby(speaker, myPlayer)) {
-      this.reactToVoice();
-    }
-  },
-
   // 채팅 메시지 처리
   async onPlayerChat(data) {
     console.log("onPlayerChat 호출됨, data:", data);
@@ -206,5 +208,50 @@ export const EventHandlingMixin = {
       game.setName(this.name);
       console.log("8초 후 원래 이름으로 복구");
     }, 8000);
+  },
+
+  // 컨페티 이벤트 처리
+  onConfettiShot(data, context) {
+    console.log("Confetti shot event received:", context);
+    const shooterId = context.playerId;
+    const shooter = game.players[shooterId];
+    const myPlayer = game.getMyPlayer();
+
+    if (this.isAdjacentAndFacing(shooter, myPlayer)) {
+      this.changeOwner(shooterId);
+    }
+  },
+
+  // 이모티콘 설정 이벤트 처리
+  onPlayerSetsEmote(data, context) {
+    console.log("Player sets emote event received:", context);
+    const emote = data.playerSetsEmoteV2.emote;
+    const playerId = context.playerId;
+    const player = game.players[playerId];
+    const myPlayer = game.getMyPlayer();
+
+    if (emote === "👋") {
+      if (this.isAdjacentAndFacing(player, myPlayer)) {
+        if (!this.isFacing(myPlayer, player)) {
+          const dx = player.x - myPlayer.x;
+          const dy = player.y - myPlayer.y;
+          const direction = this.getDirection(dx, dy);
+          game.move(direction, true);
+        }
+        this.emojiQueue = [];
+        this.showEmoji("👋");
+      }
+    }
+  },
+
+  // 플레이어 말하기 이벤트 처리
+  onPlayerSpeaking(data, context) {
+    const speakerId = context.playerId;
+    const speaker = game.players[speakerId];
+    const myPlayer = game.getMyPlayer();
+
+    if (this.isNearby(speaker, myPlayer)) {
+      this.reactToVoice();
+    }
   },
 };
