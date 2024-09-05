@@ -107,15 +107,12 @@ export const MovementMixin = {
       const mapId = gameSpace.mapId;
       const x = myPlayer.x;
       const y = myPlayer.y;
-      await this.delay(300);
-      await this.changeColor("yellow");
-      await this.delay(300);
-      game.teleport(mapId, 1, 57);
-      await this.delay(300);
+      // await this.changeColor("orange");
+      // game.teleport(mapId, 1, 57);
+      // await this.delay(300);
 
       game.teleport(mapId, target.x + (x - target.x) * 0.1, target.y + (y - target.y) * 0.1);
-      await this.changeColor("beige");
-      await this.delay(300);
+      // await this.changeColor("beige");
       return;
     }
 

@@ -9,7 +9,7 @@ export class MyCustomPet {
     // 동작 관련 설정
     this.movementInterval = null;
     this.followRange = 8;
-    this.loseInterestRange = 10;
+    this.loseInterestRange = 12;
     this.normalInterval = 3000;
     this.followingInterval = 1;
     this.maxMoveDistance = 3;
@@ -177,9 +177,7 @@ export class MyCustomPet {
 
   // 다음 행동 스케줄링
   async scheduleNextBehavior() {
-    const interval = this.ownerId
-      ? this.followingInterval
-      : this.normalInterval;
+    const interval = this.ownerId ? this.followingInterval : this.normalInterval;
     await new Promise((resolve) => setTimeout(resolve, interval));
     if (this.isActive) {
       await this.behave();
